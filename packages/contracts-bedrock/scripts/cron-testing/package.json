@@ -1,0 +1,17 @@
+{
+  "name": "cron-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "deploy-cron-contracts": "node scripts/deploy-cron-contracts.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethereumjs-common": "^1.5.2",
+    "ethereumjs-tx": "^2.1.2",
+    "web3": "^1.9.0"
+  }
+}

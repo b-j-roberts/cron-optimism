@@ -14,8 +14,9 @@ contract BlockCronJobs is Semver, Ownable, IJob {
     uint256 public MINIMUM_BLOCK_INTERVAL = 10;
 
     address[] public jobs;
+    uint256[] public lastExecutedAt;
     mapping(address => uint256) public jobIntervals;
-    mapping(address => uint256) public lastExecutedAt; // TODO: Use % and error on overflow gas limit instead?
+    //mapping(address => uint256) public lastExecutedAt; // TODO: Use % and error on overflow gas limit instead?
 
     constructor(address _owner) Ownable() Semver(0, 0, 1) {
         transferOwnership(_owner);
@@ -31,6 +32,7 @@ contract BlockCronJobs is Semver, Ownable, IJob {
 
         jobs.push(_job);
         jobIntervals[_job] = _interval;
+        lastExecutedAt.push(block.number);
     }
 
     function removeJob(address _job) external onlyOwner {
@@ -42,6 +44,9 @@ contract BlockCronJobs is Semver, Ownable, IJob {
                 // Note : This means the order of jobs will change
                 jobs[i] = jobs[jobs.length - 1];
                 jobs.pop();
+
+                lastExecutedAt[i] = lastExecutedAt[lastExecutedAt.length - 1];
+                lastExecutedAt.pop();
                 break;
             }
         }
@@ -54,14 +59,19 @@ contract BlockCronJobs is Semver, Ownable, IJob {
         for (uint256 i = 0; i < jobs.length; i++) {
             address job = jobs[i];
             uint256 interval = jobIntervals[job];
-            uint256 lastExecuted = lastExecutedAt[job];
+            uint256 lastExecuted = lastExecutedAt[i];
 
+            //TODO: Index lastExecutedAt[job] by id in jobs array to allow multiple jobs to be executed for same contract address
             //TODO: Stop and save position for next block if full on gas? or allow pageing & client controlled usage?
             // https://ethereum.stackexchange.com/questions/134968/is-possible-to-control-gasleft-and-exit-of-a-loop-before-out-of-gas-return
             if (block.number >= lastExecuted + interval) {
                 IJob(job).executeCron();
-                lastExecutedAt[job] = block.number;
+                lastExecutedAt[i] = block.number;
             }
         }
+    }
+
+    function getJobs() external view returns (address[] memory) {
+        return jobs;
     }
 }

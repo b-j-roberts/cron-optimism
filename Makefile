@@ -154,3 +154,26 @@ bedrock-markdown-links:
 
 install-geth:
 	go install github.com/ethereum/go-ethereum/cmd/geth@v1.12.0
+
+ACCOUNT_ADDR ?= $(shell cat ${HOME}/l1-op-node/keystore/UTC* | jq -r '.address')
+PRIV_KEY ?= $(shell node ${HOME}/workspace/blockchain/blockchain-tools/optimism/scripts/private_keys.js ${HOME}/l1-op-node/ $(shell cat ${HOME}/l1-op-node/keystore/UTC* | jq -r '.address'))
+L1_RPC ?= http://localhost:8545
+RPC_KIND ?= any
+L2OO_ADDR ?= $(shell cat packages/contracts-bedrock/deployments/getting-started/L2OutputOracleProxy.json | jq -r .address)
+
+setup-l2:
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} ./scripts/setup-optimism-l1.sh
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} ./scripts/setup-optimism-l2.sh
+
+run-op-geth:
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} L1_RPC=${L1_RPC} RPC_KIND=${RPC_KIND} L2OO_ADDR=${L2OO_ADDR} SEQ_KEY=${PRIV_KEY} BATCHER_KEY=${PRIV_KEY} PROPOSER_KEY=${PRIV_KEY} ./scripts/start-op-geth.sh
+
+run-op-node:
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} L1_RPC=${L1_RPC} RPC_KIND=${RPC_KIND} L2OO_ADDR=${L2OO_ADDR} SEQ_KEY=${PRIV_KEY} BATCHER_KEY=${PRIV_KEY} PROPOSER_KEY=${PRIV_KEY} ./scripts/start-op-node.sh
+
+run-op-batcher:
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} L1_RPC=${L1_RPC} RPC_KIND=${RPC_KIND} L2OO_ADDR=${L2OO_ADDR} SEQ_KEY=${PRIV_KEY} BATCHER_KEY=${PRIV_KEY} PROPOSER_KEY=${PRIV_KEY} ./scripts/start-op-batcher.sh
+
+run-op-proposer:
+	ACCOUNT_ADDR=${ACCOUNT_ADDR} L1_RPC=${L1_RPC} RPC_KIND=${RPC_KIND} L2OO_ADDR=${L2OO_ADDR} SEQ_KEY=${PRIV_KEY} BATCHER_KEY=${PRIV_KEY} PROPOSER_KEY=${PRIV_KEY} ./scripts/start-op-proposer.sh
+
