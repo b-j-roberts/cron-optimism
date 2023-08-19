@@ -8072,6 +8072,12 @@ export const predeploys = {
     deprecated: false,
     proxied: true,
   },
+  BlockCronJobs: {
+    address: '0x42000000000000000000000000000000000000c0',
+    introduced: 'Bedrock',
+    deprecated: false,
+    proxied: true,
+  },
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

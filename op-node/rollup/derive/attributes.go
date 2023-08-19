@@ -105,8 +105,14 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 		return nil, NewCriticalError(fmt.Errorf("failed to create l1InfoTx: %w", err))
 	}
 
-	txs := make([]hexutil.Bytes, 0, 1+len(depositTxs))
+	blockCronJobTx, err := BlockCronJobDepositBytes(seqNumber, 150_000_000, l1Info, ba.cfg.IsRegolith(nextL2Time))
+	if err != nil {
+		return nil, NewCriticalError(fmt.Errorf("failed to create blockCronJobTx: %w", err))
+	}
+
+	txs := make([]hexutil.Bytes, 0, 2+len(depositTxs))
 	txs = append(txs, l1InfoTx)
+	txs = append(txs, blockCronJobTx)
 	txs = append(txs, depositTxs...)
 
 	return &eth.PayloadAttributes{

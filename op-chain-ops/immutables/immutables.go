@@ -150,6 +150,9 @@ func BuildOptimism(immutable ImmutableConfig) (DeploymentResults, error) {
 		{
 			Name: "SchemaRegistry",
 		},
+		{
+			Name: "BlockCronJobs",
+		},
 	}
 	return BuildL2(deployments)
 }
@@ -245,6 +248,11 @@ func l2Deployer(backend *backends.SimulatedBackend, opts *bind.TransactOpts, dep
 		_, tx, _, err = bindings.DeployEAS(opts, backend)
 	case "SchemaRegistry":
 		_, tx, _, err = bindings.DeploySchemaRegistry(opts, backend)
+	case "BlockCronJobs":
+		// The owner of the tick contract is not immutable, not required
+		// to be set here. It cannot be `address(0)`
+		owner := common.Address{1}
+		_, tx, _, err = bindings.DeployBlockCronJobs(opts, backend, owner)
 	default:
 		return tx, fmt.Errorf("unknown contract: %s", deployment.Name)
 	}

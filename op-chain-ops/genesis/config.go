@@ -97,6 +97,7 @@ type DeployConfig struct {
 
 	L2GenesisBlockNonce         hexutil.Uint64 `json:"l2GenesisBlockNonce"`
 	L2GenesisBlockGasLimit      hexutil.Uint64 `json:"l2GenesisBlockGasLimit"`
+	L2GenesisBlockCronJobGasLimit hexutil.Uint64 `json:"l2GenesisBlockCronJobGasLimit"`
 	L2GenesisBlockDifficulty    *hexutil.Big   `json:"l2GenesisBlockDifficulty"`
 	L2GenesisBlockMixHash       common.Hash    `json:"l2GenesisBlockMixHash"`
 	L2GenesisBlockNumber        hexutil.Uint64 `json:"l2GenesisBlockNumber"`
@@ -175,6 +176,8 @@ type DeployConfig struct {
 	// FundDevAccounts configures whether or not to fund the dev accounts. Should only be used
 	// during devnet deployments.
 	FundDevAccounts bool `json:"fundDevAccounts"`
+
+	BlockCronJobOwner common.Address `json:"blockCronJobOwner"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy
@@ -429,6 +432,7 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 				Overhead:    eth.Bytes32(common.BigToHash(new(big.Int).SetUint64(d.GasPriceOracleOverhead))),
 				Scalar:      eth.Bytes32(common.BigToHash(new(big.Int).SetUint64(d.GasPriceOracleScalar))),
 				GasLimit:    uint64(d.L2GenesisBlockGasLimit),
+				BlockCronJobGasLimit: uint64(d.L2GenesisBlockCronJobGasLimit),
 			},
 		},
 		BlockTime:              d.L2BlockTime,
@@ -699,6 +703,9 @@ func NewL2StorageConfig(config *DeployConfig, block *types.Block) (state.Storage
 		"bridge":        predeploys.L2StandardBridgeAddr,
 		"_initialized":  2,
 		"_initializing": false,
+	}
+	storage["BlockCronJobs"] = state.StorageValues{
+		"_owner": config.BlockCronJobOwner,
 	}
 	return storage, nil
 }

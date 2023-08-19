@@ -291,5 +291,6 @@ type SystemConfig struct {
 	Scalar Bytes32 `json:"scalar"`
 	// GasLimit identifies the L2 block gas limit
 	GasLimit uint64 `json:"gasLimit"`
-	// More fields can be added for future SystemConfig versions.
+	// BlockGasLimit identifies the L2 block gas limit for block cron jobs
+	BlockCronJobGasLimit uint64 `json:"blockCronJobGasLimit"`
 }
