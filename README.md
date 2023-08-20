@@ -1,3 +1,46 @@
+# Cron Optimism
+
+Op stack hack of the derivation layer, which adds a transaction to each block ticking all added cron jobs on the chain.
+
+### More Info
+
+Contracts implementing a cronjob just implement the interface
+```
+interface IJob {
+  function executeCron() external;
+}
+```
+
+Sequencer can add/remove jobs to the list of executed cron jobs by calling the new predeploy contractat `0x42000000000000000000000000000000000000c0` with :
+- `addJob(address _job, uint256 _interval)` : `_job` is contract implementing `executeCron()` & `_interval` is # of blocks between executions of `executeCron()`
+- `removeJob(address _job)`
+
+NOTE: If you want `executeCron()` contract to only be callable by cron job setup & not externally add a line this to your `executeCron()` function :
+```
+require(msg.sender == address(0x42000000000000000000000000000000000000c0), "executeCron() is only callable by predeploy contract");
+```
+
+Here are some example cast commands to make it a little easier :
+```
+cast send --private-key <priv-key> --rpc-url <rpc> 0x42000000000000000000000000000000000000c0 'addJob(address,uint256)' <cron-contract-address> <interval> --gas-price 1000 --gas-limit 100000
+```
+
+
+WARNING : There is currently no pageination for the overall `executeCron()` tx on each block, therefore it is possible for the sequencer to add too many jobs that might make `executeCron()` exceed gas limits.
+
+### Testing Setup
+
+I included some scripts and a basic `CronContract.sol` which has an `executeCron()` function that just counts up. You can find that setup under `packages/contracts-bedrock/scripts/cron-testing`. To check the value of the counter after adding the contract job, use something like :
+```
+cast call --rpc-url <rpc> <cron-contract-address> 'getCronContractValue()'
+```
+
+### Things To Do
+- Make testing w/ cron contract easier ( check under `packages/contracts-bedrock/scripts/cron-testing` )
+- Clear out duplicate blockchain-tools code in `packages/contracts-bedrock/scripts/cron-testing/` & `scripts`
+- Fix issue w/ transactions pending for a long time on contract deploy
+
+---
 
 <div align="center">
   <br />

@@ -705,7 +705,7 @@ func NewL2StorageConfig(config *DeployConfig, block *types.Block) (state.Storage
 		"_initializing": false,
 	}
 	storage["BlockCronJobs"] = state.StorageValues{
-		"owner": config.BlockCronJobOwner,
+		"_owner": config.BlockCronJobOwner,
 	}
 	return storage, nil
 }

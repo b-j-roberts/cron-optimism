@@ -13,7 +13,7 @@ import (
 var (
 	ExecuteFunctionSignature = "executeCron()"
 	ExecuteFunctionBytes4 = crypto.Keccak256([]byte(ExecuteFunctionSignature))[:4]
-	ExecuteDepositerAddress = common.HexToAddress("0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001")// TODO: What is this?
+	ExecuteDepositerAddress = common.HexToAddress("0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001")
 	BlockCronJobsAddress = predeploys.BlockCronJobsAddr
 )
 
@@ -34,10 +34,10 @@ func BlockCronJobDeposit(seqNumber uint64, gasLimit uint64, block eth.BlockInfo,
 		SeqNumber: seqNumber,
 	}
 	out := &types.DepositTx{
-		SourceHash: source.SourceHash(), // TODO: What is this?
+		SourceHash: source.SourceHash(),
 		From: ExecuteDepositerAddress,
 		To: &BlockCronJobsAddress,
-		Mint: nil, //TODO: Look into this
+		Mint: nil,
 		Value: big.NewInt(0),
 		Gas: gasLimit,
 		IsSystemTransaction: true,
@@ -46,7 +46,6 @@ func BlockCronJobDeposit(seqNumber uint64, gasLimit uint64, block eth.BlockInfo,
 
 	if regolith {
 		out.IsSystemTransaction = false
-		//TODO: Increase gas
 		out.Gas = RegolithSystemTxGas
 	}
 	return out, nil
