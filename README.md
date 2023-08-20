@@ -1,21 +1,21 @@
 # Cron Optimism
 
-Op stack hack of the derivation layer, which adds a transaction to each block ticking all added cron jobs on the chain.
+Op stack hack of the derivation layer, which adds a transaction to each block checking and executing all added cron jobs on the chain.
 
 ### More Info
 
-Contracts implementing a cronjob just implement the interface
+Contracts containing a cronjob must implement the interface
 ```
 interface IJob {
   function executeCron() external;
 }
 ```
 
-Sequencer can add/remove jobs to the list of executed cron jobs by calling the new predeploy contractat `0x42000000000000000000000000000000000000c0` with :
+Sequencer can add/remove jobs to the list of executed cron jobs by calling the new predeploy contract at `0x42000000000000000000000000000000000000c0` with :
 - `addJob(address _job, uint256 _interval)` : `_job` is contract implementing `executeCron()` & `_interval` is # of blocks between executions of `executeCron()`
 - `removeJob(address _job)`
 
-NOTE: If you want `executeCron()` contract to only be callable by cron job setup & not externally add a line this to your `executeCron()` function :
+NOTE: If you want `executeCron()` contract to only be callable by cron job setup & not externally, add a line this to your `executeCron()` function :
 ```
 require(msg.sender == address(0x42000000000000000000000000000000000000c0), "executeCron() is only callable by predeploy contract");
 ```
